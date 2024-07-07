@@ -20,6 +20,32 @@ app.post("/api/referrals", async (req, res) => {
     message,
   } = req.body;
 
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: false,
+
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: "lavaraju.gorli4149@gmail.com",
+    to: refereeEmail,
+    subject: "Referral Notification",
+    text: `You have been referred to the course: ${course} by ${referrerName}. Message: ${message}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email:", error);
+    } else {
+      console.log("Email sent:", info.response);
+    }
+  });
+
   if (
     !referrerName ||
     !referrerEmail ||
@@ -40,32 +66,6 @@ app.post("/api/referrals", async (req, res) => {
         course,
         message,
       },
-    });
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: false,
-
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: "lavaraju.gorli4149@gmail.com",
-      to: refereeEmail,
-      subject: "Referral Notification",
-      text: `You have been referred to the course: ${course} by ${referrerName}. Message: ${message}`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
     });
 
     res.status(201).json(referral);
