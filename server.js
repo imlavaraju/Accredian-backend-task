@@ -24,7 +24,6 @@ app.post("/api/referrals", async (req, res) => {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     secure: false,
-
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -38,25 +37,18 @@ app.post("/api/referrals", async (req, res) => {
     text: `You have been referred to the course: ${course} by ${referrerName}. Message: ${message}`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error sending email:", error);
-    } else {
-      console.log("Email sent:", info.response);
-    }
-  });
-
-  /*if (
-    !referrerName ||
-    !referrerEmail ||
-    !refereeName ||
-    !refereeEmail ||
-    !course
-  ) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
   try {
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
+    // Save referral to database
     const referral = await prisma.referral.create({
       data: {
         referrerName,
@@ -70,8 +62,9 @@ app.post("/api/referrals", async (req, res) => {
 
     res.status(201).json(referral);
   } catch (error) {
-    res.status(500).json({ error: `Internal server error${error}` });
-  }*/
+    console.error("Error saving referral:", error);
+    res.status(500).json({ error: `Internal server error: ${error.message}` });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
