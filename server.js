@@ -46,7 +46,7 @@ app.post("/api/referrals", async (req, res) => {
     }
   });
 
-  if (
+  /*if (
     !referrerName ||
     !referrerEmail ||
     !refereeName ||
@@ -71,7 +71,7 @@ app.post("/api/referrals", async (req, res) => {
     res.status(201).json(referral);
   } catch (error) {
     res.status(500).json({ error: `Internal server error${error}` });
-  }
+  }*/
 });
 
 const PORT = process.env.PORT || 5000;
